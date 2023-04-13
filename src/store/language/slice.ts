@@ -5,7 +5,7 @@ interface LanguageState {
 }
 
 export const languageInitialState = {
-  language: 'English',
+  language: 'Português',
 } as LanguageState
 
 export const languageSlice = createSlice({

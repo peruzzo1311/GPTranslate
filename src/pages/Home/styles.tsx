@@ -7,7 +7,7 @@ export const styles = StyleSheet.create({
     justifyContent: 'flex-start',
   },
   textArea: {
-    padding: 12,
+    height: 250,
     textAlignVertical: 'top',
   },
 })

@@ -21,10 +21,16 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#203F6B"
-      }
+      },
+      "package": "com.peruzzo1311.apptranslate"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "9a309700-cd34-443c-b952-cdec4c4707fe"
+      }
     }
   }
 }

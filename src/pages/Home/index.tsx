@@ -30,6 +30,10 @@ export default function Home() {
   const id = 'toast'
   const { onCopy } = useClipboard()
   const language = useAppSelector((state) => state.language.language)
+  const targetLanguage = useAppSelector(
+    (state) => state.targetLanguage.targetLanguage
+  )
+  const context = useAppSelector((state) => state.context.context)
 
   const handleSubmit = async (e: any) => {
     e.preventDefault()
@@ -47,9 +51,15 @@ export default function Home() {
       return
     }
 
-    await Translate(request, language).then((response) => {
-      setResult(response.trim())
-    })
+    await Translate({ request, language, targetLanguage, context })
+      .then((response) => {
+        setResult(response.trim())
+      })
+      .catch((err) => {
+        setIsLoading(false)
+
+        console.log(err)
+      })
 
     setIsLoading(false)
   }
@@ -86,7 +96,7 @@ export default function Home() {
         </Alert>
       </PresenceTransition>
 
-      <VStack flex={1} space={8}>
+      <VStack flex={1} space={4}>
         <PresenceTransition
           visible={true}
           initial={{
@@ -129,21 +139,20 @@ export default function Home() {
             padding={4}
             zIndex={10}
           >
-            <VStack space={8}>
-              <Text fontSize='xl' fontWeight={'bold'} textAlign={'center'}>
-                Tradutor
-              </Text>
-
+            <VStack space={4}>
               <Input
-                h={'250px'}
                 fontSize={'lg'}
                 style={styles.textArea}
+                shadow={2}
                 placeholder='Digite o texto a ser traduzido'
                 multiline={true}
                 borderRadius={'md'}
                 borderWidth={1}
                 borderColor={'#203F6B'}
                 variant={'filled'}
+                _focus={{
+                  bgColor: '#eee',
+                }}
                 onChangeText={(value) => setRequest(value)}
               />
 
@@ -152,6 +161,7 @@ export default function Home() {
                 alignSelf={'center'}
                 size={'lg'}
                 bgColor={'#203F6B'}
+                shadow={2}
                 _text={{ color: 'white', fontWeight: 'bold', fontSize: 'md' }}
                 leftIcon={
                   <Icon
@@ -169,7 +179,7 @@ export default function Home() {
 
               <VStack>
                 <Input
-                  h={'250px'}
+                  shadow={2}
                   fontSize={'lg'}
                   style={styles.textArea}
                   placeholder='Tradução'

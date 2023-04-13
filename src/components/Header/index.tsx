@@ -1,30 +1,63 @@
-import { HStack, Select, Text, View, VStack } from 'native-base'
-import { useAppSelector, useAppDispatch } from '../../store/hooks'
-import { languages } from '../../Languages'
-import { setLanguage } from '../../store/language/slice'
-import { styles } from './styles'
+import { Ionicons } from '@expo/vector-icons'
+import { MaterialIcons } from '@expo/vector-icons'
+import {
+  Box,
+  HStack,
+  Icon,
+  IconButton,
+  Input,
+  Select,
+  VStack,
+  Text,
+  Flex,
+  Button,
+} from 'native-base'
 import React from 'react'
+
+import { languages } from '../../Languages'
+import { setContext } from '../../store/context/slice'
+import { useAppDispatch, useAppSelector } from '../../store/hooks'
+import { setLanguage } from '../../store/language/slice'
+import { setTargetLanguage } from '../../store/targetLanguage/slice'
 
 export default function Header() {
   const language = useAppSelector((state) => state.language.language)
+  const targetLanguage = useAppSelector(
+    (state) => state.targetLanguage.targetLanguage
+  )
+  const context = useAppSelector((state) => state.context.context)
   const dispatch = useAppDispatch()
 
   return (
-    <View>
-      <HStack justifyContent={'center'} mt={4}>
-        <VStack w={'90%'} space={4}>
-          <Text style={styles.Text} fontSize='xl'>
-            Escolha o idioma
-          </Text>
+    <VStack m={4} space={4}>
+      <HStack>
+        <Box w={'100%'}>
+          <Button
+            variant={'Unstyled'}
+            _text={{ color: 'white', fontWeight: 'bold', fontSize: '3xl' }}
+            leftIcon={
+              <Icon
+                as={MaterialIcons}
+                name='translate'
+                size={8}
+                color='white'
+              />
+            }
+          >
+            GPTranslate
+          </Button>
+        </Box>
+      </HStack>
+      <HStack space={4} justifyContent={'center'} alignContent={'center'}>
+        <Box width={'40%'}>
           <Select
             shadow={3}
-            placeholder='Selecione o idioma'
-            w={'90%'}
-            alignSelf={'center'}
+            placeholder='Idioma de origem'
             backgroundColor={'white'}
             fontSize={'md'}
             _selectedItem={{
-              bg: '#ddd',
+              bg: '#eee',
+              disabled: true,
             }}
             selectedValue={language}
             onValueChange={(value) => dispatch(setLanguage(value))}
@@ -33,8 +66,63 @@ export default function Header() {
               <Select.Item key={language} label={language} value={language} />
             ))}
           </Select>
-        </VStack>
+        </Box>
+
+        <Box alignContent={'center'}>
+          <IconButton
+            variant={'solid'}
+            borderRadius='full'
+            bgColor={'white'}
+            icon={
+              <Icon
+                as={Ionicons}
+                name='swap-horizontal'
+                size={6}
+                color={'black'}
+              />
+            }
+            onPress={() => {
+              dispatch(setLanguage(targetLanguage))
+              dispatch(setTargetLanguage(language))
+            }}
+          />
+        </Box>
+
+        <Box width={'40%'}>
+          <Select
+            shadow={3}
+            placeholder='Idioma de destino'
+            backgroundColor={'white'}
+            fontSize={'md'}
+            _selectedItem={{
+              bg: '#eee',
+              disabled: true,
+            }}
+            selectedValue={targetLanguage}
+            onValueChange={(value) => dispatch(setTargetLanguage(value))}
+          >
+            {languages.map((language) => (
+              <Select.Item key={language} label={language} value={language} />
+            ))}
+          </Select>
+        </Box>
       </HStack>
-    </View>
+
+      <HStack>
+        <Box w={'100%'}>
+          <Input
+            variant={'filled'}
+            placeholder='Insira um contexto para tradução'
+            fontSize={'lg'}
+            shadow={3}
+            _focus={{
+              bgColor: '#eee',
+            }}
+            value={context}
+            onChangeText={(value) => dispatch(setContext(value))}
+          />
+        </Box>
+      </HStack>
+    </VStack>
   )
 }
