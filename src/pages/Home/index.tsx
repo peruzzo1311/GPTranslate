@@ -1,8 +1,10 @@
 import { MaterialIcons } from '@expo/vector-icons'
+import { Audio, InterruptionModeAndroid, InterruptionModeIOS } from 'expo-av'
 import {
   Alert,
   Box,
   Button,
+  HStack,
   Icon,
   IconButton,
   Input,
@@ -13,19 +15,45 @@ import {
   useToast,
   VStack,
 } from 'native-base'
-import React, { useState } from 'react'
-import { Keyboard } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import { Keyboard, Platform } from 'react-native'
+import * as FileSystem from 'expo-file-system'
 
 import Header from '../../components/Header'
-import { Translate } from '../../services'
+import { Transcription, Translate } from '../../services'
 import { useAppSelector } from '../../store/hooks'
 import { styles } from './styles'
+
+const RECORDING_OPTIONS = {
+  android: {
+    extension: '.m4a',
+    outputFormat: Audio.AndroidOutputFormat.MPEG_4,
+    audioEncoder: Audio.AndroidAudioEncoder.AAC,
+    sampleRate: 44100,
+    numberOfChannels: 2,
+    bitRate: 128000,
+  },
+  ios: {
+    extension: '.wav',
+    audioQuality: Audio.IOSAudioQuality.HIGH,
+    sampleRate: 44100,
+    numberOfChannels: 1,
+    bitRate: 128000,
+    linearPCMBitDepth: 16,
+    linearPCMIsBigEndian: false,
+    linearPCMIsFloat: false,
+  },
+  web: {
+    mimeType: 'audio/webm',
+    bitsPerSecond: 128000,
+  },
+}
 
 export default function Home() {
   const [request, setRequest] = useState<string>(null)
   const [result, setResult] = useState<string>(null)
   const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [show, setShow] = useState<boolean>(false)
+  const [error, setError] = useState({ show: false, title: '' })
   const toast = useToast()
   const id = 'toast'
   const { onCopy } = useClipboard()
@@ -35,19 +63,92 @@ export default function Home() {
   )
   const context = useAppSelector((state) => state.context.context)
 
+  const [isRecording, setIsRecording] = useState<boolean>(false)
+  const [recording, setRecording] = useState<Audio.Recording | null>(null)
+
+  useEffect(() => {
+    Audio.requestPermissionsAsync().then(({ granted }) => {
+      if (granted) {
+        Audio.setAudioModeAsync({
+          allowsRecordingIOS: true,
+          interruptionModeIOS: InterruptionModeIOS.DoNotMix,
+          playsInSilentModeIOS: true,
+          shouldDuckAndroid: true,
+          interruptionModeAndroid: InterruptionModeAndroid.DoNotMix,
+          playThroughEarpieceAndroid: true,
+        })
+      }
+    })
+  }, [])
+
+  const startRecording = async () => {
+    try {
+      const { granted } = await Audio.getPermissionsAsync()
+
+      if (granted) {
+        setIsRecording(true)
+        const { recording } = await Audio.Recording.createAsync(
+          RECORDING_OPTIONS
+        )
+
+        setRecording(recording)
+      }
+    } catch (err) {
+      console.log(err)
+      setIsRecording(false)
+      setError({ show: true, title: 'Erro ao começar a gravação' })
+    }
+  }
+
+  const stopRecording = async () => {
+    try {
+      await recording.stopAndUnloadAsync()
+      setIsRecording(false)
+
+      setIsLoading(true)
+      const uri = recording.getURI()
+      const base64 = await FileSystem.readAsStringAsync(uri, {
+        encoding: FileSystem.EncodingType.Base64,
+      })
+
+      await Transcription(base64)
+        .then((response) => {
+          setRequest(response)
+
+          return response
+        })
+        .then(async (request: string) => {
+          await Translate({ request, language, targetLanguage, context })
+            .then((response) => {
+              setResult(response.trim())
+            })
+            .catch((err) => {
+              setIsLoading(false)
+
+              console.log(err)
+            })
+
+          setIsLoading(false)
+        })
+    } catch (err) {
+      console.log(err)
+      setIsRecording(false)
+      setError({ show: true, title: 'Erro ao capturar a gravação' })
+    } finally {
+      setIsRecording(false)
+    }
+  }
+
   const handleSubmit = async (e: any) => {
     e.preventDefault()
     setIsLoading(true)
 
-    if (!request || request.trim().length == 0) {
+    if (!request || request.length == 0) {
       setIsLoading(false)
-      setShow(true)
-
+      setError({ show: true, title: 'Digite um texto para ser traduzido' })
       setTimeout(() => {
-        setShow(false)
-        return
+        setError({ show: false, title: '' })
       }, 2000)
-
       return
     }
 
@@ -67,7 +168,7 @@ export default function Home() {
   return (
     <Pressable style={styles.Container} onPress={() => Keyboard.dismiss()}>
       <PresenceTransition
-        visible={show}
+        visible={error.show}
         initial={{
           opacity: 0,
           scale: 0,
@@ -91,7 +192,7 @@ export default function Home() {
         >
           <Alert.Icon />
           <Text ml={2} fontWeight='bold' fontSize='md'>
-            Texto digitado inválido!
+            {error.title}
           </Text>
         </Alert>
       </PresenceTransition>
@@ -153,29 +254,56 @@ export default function Home() {
                 _focus={{
                   bgColor: '#eee',
                 }}
+                value={request}
                 onChangeText={(value) => setRequest(value)}
               />
 
-              <Button
-                w={'75%'}
-                alignSelf={'center'}
-                size={'lg'}
-                bgColor={'#203F6B'}
-                shadow={2}
-                _text={{ color: 'white', fontWeight: 'bold', fontSize: 'md' }}
-                leftIcon={
-                  <Icon
-                    as={MaterialIcons}
-                    name='translate'
-                    size={6}
-                    color='white'
-                  />
-                }
-                isLoading={isLoading}
-                onPress={handleSubmit}
+              <HStack
+                justifyContent={'center'}
+                alignContent={'center'}
+                space={4}
               >
-                Traduzir
-              </Button>
+                <Button
+                  w={'70%'}
+                  bgColor={'#203F6B'}
+                  shadow={2}
+                  h={12}
+                  _text={{
+                    color: 'white',
+                    fontWeight: 'bold',
+                    fontSize: 'lg',
+                  }}
+                  leftIcon={
+                    <Icon
+                      as={MaterialIcons}
+                      name='translate'
+                      size={6}
+                      color='white'
+                    />
+                  }
+                  isLoading={isLoading || isRecording}
+                  isLoadingText={isRecording ? 'Gravando...' : 'Traduzindo...'}
+                  onPress={handleSubmit}
+                >
+                  Tradução
+                </Button>
+
+                <IconButton
+                  shadow={2}
+                  variant={'solid'}
+                  h={12}
+                  bgColor={isRecording ? 'red.500' : '#203F6B'}
+                  onPress={isRecording ? stopRecording : startRecording}
+                  icon={
+                    <Icon
+                      as={MaterialIcons}
+                      name={'mic'}
+                      size={7}
+                      color='white'
+                    />
+                  }
+                />
+              </HStack>
 
               <VStack>
                 <Input

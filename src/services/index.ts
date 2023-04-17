@@ -1,5 +1,4 @@
 import axios from 'axios'
-import { Alert } from 'react-native'
 
 interface ITranslate {
   request: string
@@ -9,46 +8,60 @@ interface ITranslate {
 }
 
 export const Translate = async (props: ITranslate) => {
-  const apiKey = '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'
-  const url = 'https://api.openai.com/v1/completions'
   const language = props.language.trim()
   const targetLanguage = props.targetLanguage.trim()
   const context = props.context.trim()
   const request = props.request.trim()
+  const data = JSON.stringify({
+    prompt: `
+Texto a ser traduzido: ${request}
+Contexto: ${context}
+Idioma de origem: ${language}
+Idioma de destino: ${targetLanguage}
 
-  try {
-    const data = JSON.stringify({
-      model: 'text-davinci-003',
-      prompt: `
-        Texto a ser traduzido: ${request}
-        Contexto: ${context}
-        Idioma de origem: ${language}
-        Idioma de destino: ${targetLanguage}
-      `,
-      max_tokens: 2048,
-      temperature: 0.5,
-      top_p: 1.0,
+Me retorne somente o texto traduzido
+`,
+  })
+  const config = {
+    method: 'post',
+    url: 'http://192.168.1.60:8080/translate',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: data,
+  }
+
+  return axios
+    .request(config)
+    .then((response) => {
+      return response.data
     })
+    .catch((error) => {
+      console.log(error)
+    })
+}
 
+export const Transcription = async (base64: string) => {
+  try {
     const config = {
-      method: 'post',
-      url: url,
+      method: 'POST',
+      url: 'http://192.168.1.60:8080/transcription',
       headers: {
-        Authorization: `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
-      data: data,
+      data: JSON.stringify({
+        fileName: `${Date.now()}.mp3`,
+        file: base64,
+      }),
     }
 
-    return await axios
+    return axios
       .request(config)
       .then((response) => {
-        return response.data.choices[0].text
+        return response.data
       })
       .catch((error) => {
         console.log(error)
-
-        Alert.alert('Erro', 'Erro ao traduzir o texto.')
       })
   } catch (error) {
     console.log(error)
