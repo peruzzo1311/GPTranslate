@@ -7,6 +7,9 @@ interface ITranslate {
   context: string
 }
 
+// Aqui você deverá colocar o o endereço IPV4 da sua máquina exemplo: "192.168.1.60"
+const url = '192.168.1.60'
+
 export const Translate = async (props: ITranslate) => {
   const data = JSON.stringify({
     prompt: `
@@ -20,7 +23,7 @@ Me retorne somente o texto traduzido
   })
   const config = {
     method: 'post',
-    url: 'http://192.168.1.60:3000/translate',
+    url: `http://${url}:3000/translate`,
     headers: {
       'Content-Type': 'application/json',
     },
@@ -41,7 +44,7 @@ export const Transcription = async (base64: string) => {
   try {
     const config = {
       method: 'POST',
-      url: 'http://192.168.1.60:3000/transcription',
+      url: `http://${url}:3000/transcription`,
       headers: {
         'Content-Type': 'application/json',
       },
