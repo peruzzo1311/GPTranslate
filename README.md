@@ -9,7 +9,7 @@ O usuário insere o texto que deseja traduzir no aplicativo e o servidor respons
 ## Como usar
 
 1. Na pasta raíz do projeto, faça o download das dependências do app:
-   `npm install`
+   ``npm install``
 2. Insira o texto que deseja traduzir na caixa de texto.
 3. Selecione o idioma em que o texto está escrito.
 4. Escolha o idioma para o qual você deseja traduzir o texto.
