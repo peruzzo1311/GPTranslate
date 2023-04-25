@@ -22,7 +22,9 @@ npx expo -h
 npm install
 ```
 
-3. Após instalar as dependências, execute o comando para rodar o aplicativo:
+3. Para que o aplicativo faça as requisições corretamente, você deverá alterar a variável url para o IPV4 da sua máquina. A variável está dentro de ./src/services/index.tsx
+
+4. Após instalar as dependências, execute o comando para rodar o aplicativo:
 
 ```
 npx expo start
@@ -30,16 +32,16 @@ npx expo start
 
 #### Para abrir o servidor você deverá fazer os seguintes passos:
 
-4. Navegue até a pasta ./api e execute o comando:
+5. Navegue até a pasta ./api e execute o comando:
 
 ```
 npm install
 ```
 
-5. Após instalar as depêndencias do servidor, execute o comando:
+6. Após instalar as depêndencias do servidor, execute o comando:
 
 ```
 npm run dev
 ```
 
-6. Por fim, você precisará baixar o expoGo e escanear o QRCode mostrado no terminal para executar o aplicativo no seu celular
+7. Por fim, você precisará baixar o expoGo e escanear o QRCode mostrado no terminal para executar o aplicativo no seu celular
