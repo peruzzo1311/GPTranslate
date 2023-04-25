@@ -8,14 +8,14 @@
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",
-      "resizeMode": "center",
       "backgroundColor": "#203F6B"
     },
     "assetBundlePatterns": [
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.peruzzo1311.apptranslate"
     },
     "android": {
       "adaptiveIcon": {

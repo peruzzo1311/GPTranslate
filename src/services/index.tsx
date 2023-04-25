@@ -8,23 +8,19 @@ interface ITranslate {
 }
 
 export const Translate = async (props: ITranslate) => {
-  const language = props.language.trim()
-  const targetLanguage = props.targetLanguage.trim()
-  const context = props.context.trim()
-  const request = props.request.trim()
   const data = JSON.stringify({
     prompt: `
-Texto a ser traduzido: ${request}
-Contexto: ${context}
-Idioma de origem: ${language}
-Idioma de destino: ${targetLanguage}
+Texto a ser traduzido: ${props.request}
+Contexto: ${props.context}
+Idioma de origem: ${props.language}
+Idioma de destino: ${props.targetLanguage}
 
 Me retorne somente o texto traduzido
 `,
   })
   const config = {
     method: 'post',
-    url: 'http://192.168.1.60:8080/translate',
+    url: 'http://192.168.1.60:3000/translate',
     headers: {
       'Content-Type': 'application/json',
     },
@@ -45,7 +41,7 @@ export const Transcription = async (base64: string) => {
   try {
     const config = {
       method: 'POST',
-      url: 'http://192.168.1.60:8080/transcription',
+      url: 'http://192.168.1.60:3000/transcription',
       headers: {
         'Content-Type': 'application/json',
       },

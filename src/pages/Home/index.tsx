@@ -16,7 +16,7 @@ import {
   VStack,
 } from 'native-base'
 import React, { useEffect, useState } from 'react'
-import { Keyboard, Platform } from 'react-native'
+import { Keyboard } from 'react-native'
 import * as FileSystem from 'expo-file-system'
 
 import Header from '../../components/Header'
@@ -97,6 +97,9 @@ export default function Home() {
       console.log(err)
       setIsRecording(false)
       setError({ show: true, title: 'Erro ao começar a gravação' })
+      setTimeout(() => {
+        setError({ show: false, title: '' })
+      }, 2000)
     }
   }
 
@@ -120,7 +123,17 @@ export default function Home() {
         .then(async (request: string) => {
           await Translate({ request, language, targetLanguage, context })
             .then((response) => {
-              setResult(response.trim())
+              if (response) {
+                setResult(response.trim())
+              } else {
+                setError({
+                  show: true,
+                  title: 'Não foi possível traduzir no momento!',
+                })
+                setTimeout(() => {
+                  setError({ show: false, title: '' })
+                }, 2000)
+              }
             })
             .catch((err) => {
               setIsLoading(false)
@@ -134,6 +147,9 @@ export default function Home() {
       console.log(err)
       setIsRecording(false)
       setError({ show: true, title: 'Erro ao capturar a gravação' })
+      setTimeout(() => {
+        setError({ show: false, title: '' })
+      }, 2000)
     } finally {
       setIsRecording(false)
     }
@@ -154,7 +170,17 @@ export default function Home() {
 
     await Translate({ request, language, targetLanguage, context })
       .then((response) => {
-        setResult(response.trim())
+        if (response) {
+          setResult(response.trim())
+        } else {
+          setError({
+            show: true,
+            title: 'Não foi possível traduzir no momento!',
+          })
+          setTimeout(() => {
+            setError({ show: false, title: '' })
+          }, 2000)
+        }
       })
       .catch((err) => {
         setIsLoading(false)

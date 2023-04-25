@@ -5,7 +5,7 @@ interface ContextState {
 }
 
 export const contextInitialState = {
-  context: 'frase',
+  context: '',
 } as ContextState
 
 export const contextSlice = createSlice({
