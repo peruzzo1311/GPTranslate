@@ -1,5 +1,6 @@
 import {
   Box,
+  Divider,
   Icon,
   IconButton,
   ScrollView,
@@ -10,18 +11,53 @@ import {
 import { MaterialIcons, FontAwesome5, Ionicons } from '@expo/vector-icons'
 import { useEffect, useState } from 'react'
 import { Dimensions, Pressable } from 'react-native'
-import { useAppSelector } from '../../store/hooks'
+import { useAppDispatch, useAppSelector } from '../../store/hooks'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { setHistory } from '../../store/history/slice'
 
 export default function History() {
   const history = useAppSelector((state) => state.history.history)
   const [isOpen, setIsOpen] = useState(false)
+  const dispatch = useAppDispatch()
 
   useEffect(() => {
-    console.log(history)
+    const getData = async () => {
+      try {
+        const jsonValue = await AsyncStorage.getItem('History')
+
+        if (jsonValue) {
+          const data = JSON.parse(jsonValue)
+
+          dispatch(setHistory(data))
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
+    getData()
+  }, [])
+
+  useEffect(() => {
+    storeData(history)
   }, [history])
 
   const handlePress = () => {
     setIsOpen(!isOpen)
+  }
+
+  const storeData = async (value: IHistory[]) => {
+    try {
+      const history = JSON.stringify(value)
+
+      await AsyncStorage.setItem('History', history)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const clearHistory = () => {
+    dispatch(setHistory([]))
   }
 
   return (
@@ -71,6 +107,26 @@ export default function History() {
                 />
               }
             />
+          </Box>
+
+          <Divider my={3} bgColor={'white'} />
+
+          <Box
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'flex-end',
+            }}
+          >
+            <Text
+              alignSelf={'flex-end'}
+              color={'white'}
+              fontSize={'xl'}
+              fontWeight={'bold'}
+              onPress={clearHistory}
+            >
+              Limpar histórico
+            </Text>
           </Box>
 
           <ScrollView mt={4}>

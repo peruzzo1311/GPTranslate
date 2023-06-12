@@ -172,34 +172,34 @@ export default function Home() {
       return
     }
 
-    const addHistory: IHistory = {
-      idiomaOrigem: language,
-      idiomaDestino: targetLanguage,
-      textoOrigem: request,
-      textoDestino: 'teste',
-    }
+    await Translate({ request, language, targetLanguage, context })
+      .then((response) => {
+        if (response) {
+          setResult(response.trim())
 
-    dispatch(setHistory([addHistory, ...history]))
+          const addHistory: IHistory = {
+            idiomaOrigem: language,
+            idiomaDestino: targetLanguage,
+            textoOrigem: request,
+            textoDestino: response.trim(),
+          }
 
-    // await Translate({ request, language, targetLanguage, context })
-    //   .then((response) => {
-    //     if (response) {
-    //       setResult(response.trim())
-    //     } else {
-    //       setError({
-    //         show: true,
-    //         title: 'Não foi possível traduzir no momento!',
-    //       })
-    //       setTimeout(() => {
-    //         setError({ show: false, title: '' })
-    //       }, 2000)
-    //     }
-    //   })
-    //   .catch((err) => {
-    //     setIsLoading(false)
+          dispatch(setHistory([addHistory, ...history]))
+        } else {
+          setError({
+            show: true,
+            title: 'Não foi possível traduzir no momento!',
+          })
+          setTimeout(() => {
+            setError({ show: false, title: '' })
+          }, 2000)
+        }
+      })
+      .catch((err) => {
+        setIsLoading(false)
 
-    //     console.log(err)
-    //   })
+        console.log(err)
+      })
 
     setIsLoading(false)
   }
