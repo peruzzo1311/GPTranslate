@@ -21,8 +21,10 @@ import * as FileSystem from 'expo-file-system'
 
 import Header from '../../components/Header'
 import { Transcription, Translate } from '../../services'
-import { useAppSelector } from '../../store/hooks'
+import { useAppDispatch, useAppSelector } from '../../store/hooks'
 import { styles } from './styles'
+import History from '../../components/History'
+import { setHistory } from '../../store/history/slice'
 
 const RECORDING_OPTIONS = {
   android: {
@@ -62,6 +64,8 @@ export default function Home() {
     (state) => state.targetLanguage.targetLanguage
   )
   const context = useAppSelector((state) => state.context.context)
+  const history = useAppSelector((state) => state.history.history)
+  const dispatch = useAppDispatch()
 
   const [isRecording, setIsRecording] = useState<boolean>(false)
   const [recording, setRecording] = useState<Audio.Recording | null>(null)
@@ -168,25 +172,34 @@ export default function Home() {
       return
     }
 
-    await Translate({ request, language, targetLanguage, context })
-      .then((response) => {
-        if (response) {
-          setResult(response.trim())
-        } else {
-          setError({
-            show: true,
-            title: 'Não foi possível traduzir no momento!',
-          })
-          setTimeout(() => {
-            setError({ show: false, title: '' })
-          }, 2000)
-        }
-      })
-      .catch((err) => {
-        setIsLoading(false)
+    const addHistory: IHistory = {
+      idiomaOrigem: language,
+      idiomaDestino: targetLanguage,
+      textoOrigem: request,
+      textoDestino: 'teste',
+    }
 
-        console.log(err)
-      })
+    dispatch(setHistory([addHistory, ...history]))
+
+    // await Translate({ request, language, targetLanguage, context })
+    //   .then((response) => {
+    //     if (response) {
+    //       setResult(response.trim())
+    //     } else {
+    //       setError({
+    //         show: true,
+    //         title: 'Não foi possível traduzir no momento!',
+    //       })
+    //       setTimeout(() => {
+    //         setError({ show: false, title: '' })
+    //       }, 2000)
+    //     }
+    //   })
+    //   .catch((err) => {
+    //     setIsLoading(false)
+
+    //     console.log(err)
+    //   })
 
     setIsLoading(false)
   }
@@ -289,8 +302,10 @@ export default function Home() {
                 alignContent={'center'}
                 space={4}
               >
+                <History />
+
                 <Button
-                  w={'70%'}
+                  w={'60%'}
                   bgColor={'#203F6B'}
                   shadow={2}
                   h={12}

@@ -1,16 +1,15 @@
-import { Ionicons } from '@expo/vector-icons'
-import { MaterialIcons } from '@expo/vector-icons'
+import { Ionicons, MaterialIcons } from '@expo/vector-icons'
 import {
   Box,
+  Button,
   HStack,
   Icon,
   IconButton,
   Input,
   Select,
+  Slide,
   VStack,
   Text,
-  Flex,
-  Button,
 } from 'native-base'
 import React from 'react'
 
@@ -33,6 +32,7 @@ export default function Header() {
       <HStack>
         <Box w={'100%'}>
           <Button
+            ml={-12}
             variant={'Unstyled'}
             _text={{ color: 'white', fontWeight: 'bold', fontSize: '3xl' }}
             leftIcon={
