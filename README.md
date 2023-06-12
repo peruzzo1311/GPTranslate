@@ -8,27 +8,38 @@ O usuário insere o texto que deseja traduzir no aplicativo e o servidor respons
 
 ## Como usar
 
-1. Na pasta raíz do projeto, faça o download das dependências do app:
-   `npm install`
-2. Insira o texto que deseja traduzir na caixa de texto.
-3. Selecione o idioma em que o texto está escrito.
-4. Escolha o idioma para o qual você deseja traduzir o texto.
-5. Clique em "Traduzir" e aguarde a resposta do servidor.
+#### Para abrir o aplicativo você deverá fazer os seguintes passos:
 
-O aplicativo exibirá a tradução na tela. O usuário pode copiar a tradução para a área de transferência ou compartilhar a tradução por meio de redes sociais ou e-mail.
+1. Para rodar o aplicativo, será necessário isntalar o Expo CLI através do comando:
 
-## Contribuições
+```
+npx expo -h
+```
 
-Contribuições são bem-vindas! Se você deseja contribuir para o aplicativo Tradutor com ChatGPT, por favor, envie uma solicitação de pull ou entre em contato com o autor.
+2. Após instalado a expo CLI, navegue até a pasta raíz do projeto e execute o seguinte comando:
 
-## Licença
+```
+npm install
+```
 
-Este aplicativo é distribuído sob a licença MIT.
+3. Após instalar as dependências, execute o comando para rodar o aplicativo:
 
-## Autor
+```
+npx expo start
+```
 
-O aplicativo Tradutor com ChatGPT foi criado por [Seu nome aqui]. Se você tiver alguma dúvida ou comentário, por favor, entre em contato por meio do meu perfil no GitHub.
+#### Para abrir o servidor você deverá fazer os seguintes passos:
 
-## Agradecimentos
+4. Navegue até a pasta ./api e execute o comando:
 
-Agradecimentos especiais à equipe do ChatGPT e a todos os colaboradores do projeto. Seu trabalho tornou possível a criação deste aplicativo incrível!
+```
+npm install
+```
+
+5. Após instalar as depêndencias do servidor, execute o comando:
+
+```
+npm run dev
+```
+
+6. Por fim, você precisará baixar o expoGo e escanear o QRCode mostrado no terminal para executar o aplicativo no seu celular
