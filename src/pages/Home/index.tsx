@@ -1,5 +1,4 @@
 import { MaterialIcons } from '@expo/vector-icons'
-import { Audio, InterruptionModeAndroid, InterruptionModeIOS } from 'expo-av'
 import {
   Alert,
   Box,
@@ -15,41 +14,15 @@ import {
   useToast,
   VStack,
 } from 'native-base'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { Keyboard } from 'react-native'
-import * as FileSystem from 'expo-file-system'
 
 import Header from '../../components/Header'
-import { Transcription, Translate } from '../../services'
+import History from '../../components/History'
+import { Translate } from '../../services'
+import { setHistory } from '../../store/history/slice'
 import { useAppDispatch, useAppSelector } from '../../store/hooks'
 import { styles } from './styles'
-import History from '../../components/History'
-import { setHistory } from '../../store/history/slice'
-
-const RECORDING_OPTIONS = {
-  android: {
-    extension: '.m4a',
-    outputFormat: Audio.AndroidOutputFormat.MPEG_4,
-    audioEncoder: Audio.AndroidAudioEncoder.AAC,
-    sampleRate: 44100,
-    numberOfChannels: 2,
-    bitRate: 128000,
-  },
-  ios: {
-    extension: '.wav',
-    audioQuality: Audio.IOSAudioQuality.HIGH,
-    sampleRate: 44100,
-    numberOfChannels: 1,
-    bitRate: 128000,
-    linearPCMBitDepth: 16,
-    linearPCMIsBigEndian: false,
-    linearPCMIsFloat: false,
-  },
-  web: {
-    mimeType: 'audio/webm',
-    bitsPerSecond: 128000,
-  },
-}
 
 export default function Home() {
   const [request, setRequest] = useState<string>(null)
@@ -66,98 +39,6 @@ export default function Home() {
   const context = useAppSelector((state) => state.context.context)
   const history = useAppSelector((state) => state.history.history)
   const dispatch = useAppDispatch()
-
-  const [isRecording, setIsRecording] = useState<boolean>(false)
-  const [recording, setRecording] = useState<Audio.Recording | null>(null)
-
-  useEffect(() => {
-    Audio.requestPermissionsAsync().then(({ granted }) => {
-      if (granted) {
-        Audio.setAudioModeAsync({
-          allowsRecordingIOS: true,
-          interruptionModeIOS: InterruptionModeIOS.DoNotMix,
-          playsInSilentModeIOS: true,
-          shouldDuckAndroid: true,
-          interruptionModeAndroid: InterruptionModeAndroid.DoNotMix,
-          playThroughEarpieceAndroid: true,
-        })
-      }
-    })
-  }, [])
-
-  const startRecording = async () => {
-    try {
-      const { granted } = await Audio.getPermissionsAsync()
-
-      if (granted) {
-        setIsRecording(true)
-        const { recording } = await Audio.Recording.createAsync(
-          RECORDING_OPTIONS
-        )
-
-        setRecording(recording)
-      }
-    } catch (err) {
-      console.log(err)
-      setIsRecording(false)
-      setError({ show: true, title: 'Erro ao começar a gravação' })
-      setTimeout(() => {
-        setError({ show: false, title: '' })
-      }, 2000)
-    }
-  }
-
-  const stopRecording = async () => {
-    try {
-      await recording.stopAndUnloadAsync()
-      setIsRecording(false)
-
-      setIsLoading(true)
-      const uri = recording.getURI()
-      const base64 = await FileSystem.readAsStringAsync(uri, {
-        encoding: FileSystem.EncodingType.Base64,
-      })
-
-      await Transcription(base64)
-        .then((response) => {
-          setRequest(response)
-
-          return response
-        })
-        .then(async (request: string) => {
-          await Translate({ request, language, targetLanguage, context })
-            .then((response) => {
-              if (response) {
-                setResult(response.trim())
-              } else {
-                setError({
-                  show: true,
-                  title: 'Não foi possível traduzir no momento!',
-                })
-                setTimeout(() => {
-                  setError({ show: false, title: '' })
-                }, 2000)
-              }
-            })
-            .catch((err) => {
-              setIsLoading(false)
-
-              console.log(err)
-            })
-
-          setIsLoading(false)
-        })
-    } catch (err) {
-      console.log(err)
-      setIsRecording(false)
-      setError({ show: true, title: 'Erro ao capturar a gravação' })
-      setTimeout(() => {
-        setError({ show: false, title: '' })
-      }, 2000)
-    } finally {
-      setIsRecording(false)
-    }
-  }
 
   const handleSubmit = async (e: any) => {
     e.preventDefault()
@@ -322,28 +203,12 @@ export default function Home() {
                       color='white'
                     />
                   }
-                  isLoading={isLoading || isRecording}
-                  isLoadingText={isRecording ? 'Gravando...' : 'Traduzindo...'}
+                  isLoading={isLoading}
+                  isLoadingText={'Traduzindo...'}
                   onPress={handleSubmit}
                 >
                   Tradução
                 </Button>
-
-                <IconButton
-                  shadow={2}
-                  variant={'solid'}
-                  h={12}
-                  bgColor={isRecording ? 'red.500' : '#203F6B'}
-                  onPress={isRecording ? stopRecording : startRecording}
-                  icon={
-                    <Icon
-                      as={MaterialIcons}
-                      name={'mic'}
-                      size={7}
-                      color='white'
-                    />
-                  }
-                />
               </HStack>
 
               <VStack>

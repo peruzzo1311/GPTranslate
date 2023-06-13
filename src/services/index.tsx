@@ -7,11 +7,12 @@ interface ITranslate {
   context: string
 }
 
-// Aqui você deverá colocar o o endereço IPV4 da sua máquina exemplo: "192.168.1.60"
-const url = '192.168.1.60'
+const api = 'sk-Tl9aW7ugEck4vyvdfgAET3'
+const key = 'BlbkFJ6nn98ji4RJ24zGoRmfNK'
 
 export const Translate = async (props: ITranslate) => {
   const data = JSON.stringify({
+    model: 'text-davinci-003',
     prompt: `
 Texto a ser traduzido: ${props.request}
 Contexto: ${props.context}
@@ -20,11 +21,13 @@ Idioma de destino: ${props.targetLanguage}
 
 Me retorne somente o texto traduzido
 `,
+    temperature: 1,
   })
   const config = {
     method: 'post',
-    url: `http://${url}:3000/translate`,
+    url: `https://api.openai.com/v1/completions`,
     headers: {
+      Authorization: `Bearer ${api}${key}`,
       'Content-Type': 'application/json',
     },
     data: data,
@@ -33,36 +36,9 @@ Me retorne somente o texto traduzido
   return axios
     .request(config)
     .then((response) => {
-      return response.data
+      return response.data.choices[0].text
     })
     .catch((error) => {
       console.log(error)
     })
-}
-
-export const Transcription = async (base64: string) => {
-  try {
-    const config = {
-      method: 'POST',
-      url: `http://${url}:3000/transcription`,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      data: JSON.stringify({
-        fileName: `${Date.now()}.mp3`,
-        file: base64,
-      }),
-    }
-
-    return axios
-      .request(config)
-      .then((response) => {
-        return response.data
-      })
-      .catch((error) => {
-        console.log(error)
-      })
-  } catch (error) {
-    console.log(error)
-  }
 }
