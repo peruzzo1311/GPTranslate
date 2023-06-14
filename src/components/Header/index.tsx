@@ -32,7 +32,6 @@ export default function Header() {
       <HStack>
         <Box w={'100%'}>
           <Button
-            ml={-12}
             variant={'Unstyled'}
             _text={{ color: 'white', fontWeight: 'bold', fontSize: '3xl' }}
             leftIcon={
@@ -50,6 +49,10 @@ export default function Header() {
       </HStack>
       <HStack space={4} justifyContent={'center'} alignContent={'center'}>
         <Box width={'40%'}>
+          <Text color={'white'} fontSize={'md'} fontWeight={'bold'}>
+            De:
+          </Text>
+
           <Select
             shadow={3}
             placeholder='Idioma de origem'
@@ -68,7 +71,7 @@ export default function Header() {
           </Select>
         </Box>
 
-        <Box alignContent={'center'}>
+        <Box alignContent={'center'} mt={7}>
           <IconButton
             variant={'solid'}
             borderRadius='full'
@@ -89,6 +92,10 @@ export default function Header() {
         </Box>
 
         <Box width={'40%'}>
+          <Text color={'white'} fontSize={'md'} fontWeight={'bold'}>
+            Para:
+          </Text>
+
           <Select
             shadow={3}
             placeholder='Idioma de destino'
