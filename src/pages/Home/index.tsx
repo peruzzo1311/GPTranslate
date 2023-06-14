@@ -9,6 +9,7 @@ import {
   Input,
   PresenceTransition,
   Pressable,
+  ScrollView,
   Text,
   useClipboard,
   useToast,
@@ -86,176 +87,178 @@ export default function Home() {
   }
 
   return (
-    <Pressable style={styles.Container} onPress={() => Keyboard.dismiss()}>
-      <PresenceTransition
-        visible={error.show}
-        initial={{
-          opacity: 0,
-          scale: 0,
-        }}
-        animate={{
-          opacity: 1,
-          scale: 1,
-          transition: {
-            duration: 250,
-          },
-        }}
-        style={{ width: '100%', position: 'absolute', zIndex: 1000 }}
-      >
-        <Alert
-          w='100%'
-          status='error'
-          variant='left-accent'
-          display='flex'
-          flexDirection='row'
-          justifyContent='center'
-        >
-          <Alert.Icon />
-          <Text ml={2} fontWeight='bold' fontSize='md'>
-            {error.title}
-          </Text>
-        </Alert>
-      </PresenceTransition>
-
-      <VStack flex={1} space={4}>
+    <ScrollView>
+      <Pressable style={styles.Container} onPress={() => Keyboard.dismiss()}>
         <PresenceTransition
-          visible={true}
+          visible={error.show}
           initial={{
-            translateX: -1000,
+            opacity: 0,
+            scale: 0,
           }}
           animate={{
-            translateX: 0,
+            opacity: 1,
+            scale: 1,
             transition: {
-              type: 'spring',
-              mass: 0.8,
+              duration: 250,
             },
           }}
+          style={{ width: '100%', position: 'absolute', zIndex: 1000 }}
         >
-          <Header />
+          <Alert
+            w='100%'
+            status='error'
+            variant='left-accent'
+            display='flex'
+            flexDirection='row'
+            justifyContent='center'
+          >
+            <Alert.Icon />
+            <Text ml={2} fontWeight='bold' fontSize='md'>
+              {error.title}
+            </Text>
+          </Alert>
         </PresenceTransition>
 
-        <PresenceTransition
-          style={{ flex: 1 }}
-          visible={true}
-          initial={{
-            translateY: 1000,
-          }}
-          animate={{
-            translateY: 0,
-            transition: {
-              type: 'spring',
-              delay: 500,
-              mass: 0.5,
-              damping: 20,
-              stiffness: 100,
-              duration: 0.5,
-            },
-          }}
-        >
-          <Box
-            flex={1}
-            bg={'white'}
-            borderTopLeftRadius={32}
-            borderTopRightRadius={32}
-            padding={4}
-            zIndex={10}
+        <VStack flex={1} space={4}>
+          <PresenceTransition
+            visible={true}
+            initial={{
+              translateX: -1000,
+            }}
+            animate={{
+              translateX: 0,
+              transition: {
+                type: 'spring',
+                mass: 0.8,
+              },
+            }}
           >
-            <VStack space={4}>
-              <Input
-                fontSize={'lg'}
-                style={styles.textArea}
-                shadow={2}
-                placeholder='Digite o texto a ser traduzido'
-                multiline={true}
-                borderRadius={'md'}
-                borderWidth={1}
-                borderColor={'#203F6B'}
-                variant={'filled'}
-                _focus={{
-                  bgColor: '#eee',
-                }}
-                value={request}
-                onChangeText={(value) => setRequest(value)}
-              />
+            <Header />
+          </PresenceTransition>
 
-              <HStack
-                justifyContent={'center'}
-                alignContent={'center'}
-                space={4}
-              >
-                <History />
-
-                <Button
-                  w={'60%'}
-                  bgColor={'#203F6B'}
-                  shadow={2}
-                  h={12}
-                  _text={{
-                    color: 'white',
-                    fontWeight: 'bold',
-                    fontSize: 'lg',
-                  }}
-                  leftIcon={
-                    <Icon
-                      as={MaterialIcons}
-                      name='translate'
-                      size={6}
-                      color='white'
-                    />
-                  }
-                  isLoading={isLoading}
-                  isLoadingText={'Traduzindo...'}
-                  onPress={handleSubmit}
-                >
-                  Tradução
-                </Button>
-              </HStack>
-
-              <VStack>
+          <PresenceTransition
+            style={{ flex: 1 }}
+            visible={true}
+            initial={{
+              translateY: 1000,
+            }}
+            animate={{
+              translateY: 0,
+              transition: {
+                type: 'spring',
+                delay: 500,
+                mass: 0.5,
+                damping: 20,
+                stiffness: 100,
+                duration: 0.5,
+              },
+            }}
+          >
+            <Box
+              flex={1}
+              bg={'white'}
+              borderTopLeftRadius={32}
+              borderTopRightRadius={32}
+              padding={4}
+              zIndex={10}
+            >
+              <VStack space={4}>
                 <Input
-                  shadow={2}
                   fontSize={'lg'}
                   style={styles.textArea}
-                  placeholder='Tradução'
-                  isReadOnly={true}
+                  shadow={2}
+                  placeholder='Digite o texto a ser traduzido'
                   multiline={true}
                   borderRadius={'md'}
                   borderWidth={1}
                   borderColor={'#203F6B'}
                   variant={'filled'}
-                  value={result}
-                  InputRightElement={
-                    <IconButton
-                      variant={'solid'}
-                      bgColor={'#203F6B'}
-                      width={12}
-                      alignSelf={'flex-end'}
-                      onPress={() => {
-                        onCopy(result)
-                        if (!toast.isActive(id)) {
-                          toast.show({
-                            id,
-                            title:
-                              'Texto copiado para a área de transferência!',
-                          })
-                        }
-                      }}
-                      icon={
-                        <Icon
-                          as={MaterialIcons}
-                          name='content-copy'
-                          size={6}
-                          color='white'
-                        />
-                      }
-                    />
-                  }
+                  _focus={{
+                    bgColor: '#eee',
+                  }}
+                  value={request}
+                  onChangeText={(value) => setRequest(value)}
                 />
+
+                <HStack
+                  justifyContent={'center'}
+                  alignContent={'center'}
+                  space={4}
+                >
+                  <History />
+
+                  <Button
+                    w={'60%'}
+                    bgColor={'#203F6B'}
+                    shadow={2}
+                    h={12}
+                    _text={{
+                      color: 'white',
+                      fontWeight: 'bold',
+                      fontSize: 'lg',
+                    }}
+                    leftIcon={
+                      <Icon
+                        as={MaterialIcons}
+                        name='translate'
+                        size={6}
+                        color='white'
+                      />
+                    }
+                    isLoading={isLoading}
+                    isLoadingText={'Traduzindo...'}
+                    onPress={handleSubmit}
+                  >
+                    Tradução
+                  </Button>
+                </HStack>
+
+                <VStack>
+                  <Input
+                    shadow={2}
+                    fontSize={'lg'}
+                    style={styles.textArea}
+                    placeholder='Tradução'
+                    isReadOnly={true}
+                    multiline={true}
+                    borderRadius={'md'}
+                    borderWidth={1}
+                    borderColor={'#203F6B'}
+                    variant={'filled'}
+                    value={result}
+                    InputRightElement={
+                      <IconButton
+                        variant={'solid'}
+                        bgColor={'#203F6B'}
+                        width={12}
+                        alignSelf={'flex-end'}
+                        onPress={() => {
+                          onCopy(result)
+                          if (!toast.isActive(id)) {
+                            toast.show({
+                              id,
+                              title:
+                                'Texto copiado para a área de transferência!',
+                            })
+                          }
+                        }}
+                        icon={
+                          <Icon
+                            as={MaterialIcons}
+                            name='content-copy'
+                            size={6}
+                            color='white'
+                          />
+                        }
+                      />
+                    }
+                  />
+                </VStack>
               </VStack>
-            </VStack>
-          </Box>
-        </PresenceTransition>
-      </VStack>
-    </Pressable>
+            </Box>
+          </PresenceTransition>
+        </VStack>
+      </Pressable>
+    </ScrollView>
   )
 }
